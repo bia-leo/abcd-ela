@@ -10,4 +10,4 @@ Three scores are available:
 3) ELAfromABCD_youth.Rmd - Creates the youth-deferred ACEs proxy variable, which defaults to youth report of their experiences when available.
 
 Please cite:
-Breslin, F. J., Ratliff, E. L., Cohen, Z. P., Croff, J. M., & Kerr, K. L. Measuring adversity in the ABCD Study: Systematic review and recommendations for best practices. 
+Breslin, F. J., Ratliff, E. L., Cohen, Z. P., Croff, J. M., & Kerr, K. L. (2025). Measuring adversity in the ABCD Study: Systematic review and recommendations for best practices. _BMC Medical Research Methodology, 25_(1), 77. https://doi.org/10.1186/s12874-025-02521-5 
