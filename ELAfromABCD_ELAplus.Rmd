@@ -29,7 +29,8 @@ ela_in_abcd=readRDS("ela_in_abcd.rds")
 mh_py_le_bs=read.csv("mh_py_le_bs.csv")
 
 #create baseline dataset
-ela_in_abcd_bs = ela_in_abcd[ela_in_abcd$eventname == "baseline_year_1_arm_1", ]
+#note change in event name from 5.1
+ela_in_abcd_bs = ela_in_abcd[ela_in_abcd$eventname == "ses-00A", ]
 
 #add in life events "baseline" data
 #remove the variable label from main data set and re-add without eventname so the calculated baseline appears inline with other baseline data
@@ -38,10 +39,12 @@ ela_in_abcd_bs = ela_in_abcd_bs[c("src_subject_id","eventname","ksads_ptsd_raw_7
 ela_in_abcd_bs = left_join(ela_in_abcd_bs, mh_py_le_bs, by=c("src_subject_id")) 
 
 #create separate dfs for remaining time points
-ela_in_abcd_yr1 = ela_in_abcd[ela_in_abcd$eventname == "1_year_follow_up_y_arm_1", ]
-ela_in_abcd_yr2 = ela_in_abcd[ela_in_abcd$eventname == "2_year_follow_up_y_arm_1", ]
-ela_in_abcd_yr3 = ela_in_abcd[ela_in_abcd$eventname == "3_year_follow_up_y_arm_1", ]
-ela_in_abcd_yr4 = ela_in_abcd[ela_in_abcd$eventname == "4_year_follow_up_y_arm_1", ]
+ela_in_abcd_yr1 = ela_in_abcd[ela_in_abcd$eventname == "ses-01A", ]
+ela_in_abcd_yr2 = ela_in_abcd[ela_in_abcd$eventname == "ses-02A", ]
+ela_in_abcd_yr3 = ela_in_abcd[ela_in_abcd$eventname == "ses-03A", ]
+ela_in_abcd_yr4 = ela_in_abcd[ela_in_abcd$eventname == "ses-04A", ]
+ela_in_abcd_yr5 = ela_in_abcd[ela_in_abcd$eventname == "ses-05A", ]
+ela_in_abcd_yr6 = ela_in_abcd[ela_in_abcd$eventname == "ses-06A", ]
 
 #creating function to sum items in each domain where it will sum across the row as long as at least one variable is not NA
 sum_score <- function(x){
@@ -87,7 +90,7 @@ ela_in_abcd_bs$abuse_phy_bs = ifelse(ela_in_abcd_bs$abuse_phy_sum == 0, 0, 1)
 #KSADS A peer forced your child to do something sexually ksads_ptsd_raw_769_p
 
 #create dataframe with sexual abuse items
-abuse_sex_bs_data = c("ksads_ptsd_raw_767_p" , "ksads_ptsd_raw_768_p", "ksads_ptsd_raw_769_p")
+abuse_sex_bs_data = c("ksads_ptsd_raw_767_p" , "ksads_ptsd_raw_768_p", "ksads_ptsd_raw_768_p")
 
 #sum the items as long as they're not all NA
 ela_in_abcd_bs$abuse_sex_sum = apply(ela_in_abcd_bs[abuse_sex_bs_data],1, sum_score)
@@ -709,6 +712,8 @@ ela_in_abcd_yr3$sep_yr3 = ifelse(ela_in_abcd_yr3$sep_sum == 0, 0, 1)
 
 ```
 
+
+
 ```{r ela-longitudinal}
 ##LONGITUDINAL SCORE CREATION
 
@@ -727,7 +732,7 @@ ela_final = left_join(step2, yr3_scores, by=c("src_subject_id"))
 #save bs data
 #prep for return to long format
 bs_scores[,'fam_sep'] = NA
-bs_scores$eventname="baseline_year_1_arm_1"
+bs_scores$eventname="ses-00A"
 lookup = c(ela_plus="ela_plus_bs", abuse_phy = "abuse_phy_bs", abuse_sex = "abuse_sex_bs", abuse_emo = "abuse_emo_bs", neglect_phy = "neglect_phy_bs", neglect_emo = "neglect_emo_bs", divorce = "divorce_bs", violence = "violence_bs", mental = "mi_bs", incar = "incar_bs", sud = "su_bs", exposure = "exposure_bs", safety = "safety_bs", resources = "resources_bs")
 bs_scores=rename(bs_scores, all_of(lookup))
 
@@ -758,7 +763,7 @@ yr1_scores_final = ela_final[c("src_subject_id", "ela_plus_yr1", "abuse_phy_yr1_
 #prep for return to long format
 #empty column for family separation
 yr1_scores_final[,'fam_sep'] = NA
-yr1_scores_final$eventname="1_year_follow_up_y_arm_1"
+yr1_scores_final$eventname="ses-01A"
 lookup = c(ela_plus = "ela_plus_yr1", abuse_phy = "abuse_phy_yr1_build", abuse_sex = "abuse_sex_yr1_build", abuse_emo = "abuse_emo_yr1_build", neglect_phy = "neglect_phy_yr1_build", neglect_emo = "neglect_emo_yr1_build", divorce = "divorce_yr1_build", violence = "violence_yr1_build", mental = "mi_yr1_build", incar = "incar_yr1_build", sud = "su_yr1_build", exposure = "exposure_yr1_build", safety = "safety_yr1_build", resources = "resources_yr1_build")
 yr1_scores_final=rename(yr1_scores_final, all_of(lookup))
 
@@ -786,7 +791,7 @@ yr2_scores_final = ela_final[c("src_subject_id", "ela_plus_yr2", "abuse_phy_yr2_
 #prep for return to long format
 #empty column for family separation
 yr2_scores_final[,'fam_sep'] = NA
-yr2_scores_final$eventname="2_year_follow_up_y_arm_1"
+yr2_scores_final$eventname="ses-02A"
 lookup = c(ela_plus = "ela_plus_yr2", abuse_phy = "abuse_phy_yr2_build", abuse_sex = "abuse_sex_yr2_build", abuse_emo = "abuse_emo_yr2_build", neglect_phy = "neglect_phy_yr2_build", neglect_emo = "neglect_emo_yr2_build", divorce = "divorce_yr2_build", violence = "violence_yr2_build", mental = "mi_yr2_build", incar = "incar_yr2_build", sud = "su_yr2_build", exposure = "exposure_yr2_build", safety = "safety_yr2_build", resources = "resources_yr2_build")
 yr2_scores_final=rename(yr2_scores_final, all_of(lookup))
 
@@ -813,7 +818,7 @@ yr3_scores_final = ela_final[c("src_subject_id", "ela_plus_yr3", "abuse_phy_yr3_
 
 #prep for return to long format
 #empty column for family separation
-yr3_scores_final$eventname="3_year_follow_up_y_arm_1"
+yr3_scores_final$eventname="ses-03A"
 lookup = c(ela_plus = "ela_plus_yr3", abuse_phy = "abuse_phy_yr3_build", abuse_sex = "abuse_sex_yr3_build", abuse_emo = "abuse_emo_yr3_build", neglect_phy = "neglect_phy_yr3_build", neglect_emo = "neglect_emo_yr3_build", divorce = "divorce_yr3_build", violence = "violence_yr3_build", mental = "mi_yr3_build", incar = "incar_yr3_build", sud = "su_yr3_build", exposure = "exposure_yr3_build", safety = "safety_yr3_build", resources = "resources_yr3_build", fam_sep = "sep_yr3")
 yr3_scores_final=rename(yr3_scores_final, all_of(lookup))
 

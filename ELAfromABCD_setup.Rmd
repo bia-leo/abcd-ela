@@ -30,10 +30,33 @@ library(naniar)
 #One of the parents/caregivers went to jail?	1 = Yes; 0 = No
 #Did this happen in the past year?	1 = Yes; 0 = No
 
-mh_y_le= read.csv("ABCDdatadir/core/mental-health/mh_y_le.csv", header = TRUE, stringsAsFactors = FALSE)
+mh_y_le= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/mh_y_ple.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 mh_y_le[mh_y_le==""] =NA
+
+#recode variable names from 6.0 measures to 5.1 measures
+mh_y_le$src_subject_id = mh_y_le$participant_id
+mh_y_le$eventname = mh_y_le$session_id
+mh_y_le$ple_jail_y = mh_y_le$mh_y_ple_022
+mh_y_le$ple_separ_y = mh_y_le$mh_y_ple_018
+mh_y_le$ple_victim_y = mh_y_le$mh_y_ple_017
+mh_y_le$ple_mh_y = mh_y_le$mh_y_ple_015
+mh_y_le$ple_arrest_y = mh_y_le$mh_y_ple_014
+mh_y_le$ple_law_y = mh_y_le$mh_y_ple_019
+mh_y_le$ple_sud_y = mh_y_le$mh_y_ple_008
+mh_y_le$ple_jail_past_yr_y = mh_y_le$mh_y_ple_022__01
+mh_y_le$ple_separ_past_yr_y = mh_y_le$mh_y_ple_018__01
+mh_y_le$ple_victim_past_yr_y = mh_y_le$mh_y_ple_017__01
+mh_y_le$ple_mh_past_yr_y = mh_y_le$mh_y_ple_015__01
+mh_y_le$ple_arrest_past_yr_y = mh_y_le$mh_y_ple_014__01
+mh_y_le$ple_law_past_yr_y = mh_y_le$mh_y_ple_019__01
+mh_y_le$ple_sud_past_yr_y = mh_y_le$mh_y_ple_008__01
+mh_y_le$ple_deported_y = mh_y_le$mh_y_ple_026
+mh_y_le$ple_deported_past_yr_y = mh_y_le$mh_y_ple_026__01
+mh_y_le$ple_foster_care_y = mh_y_le$mh_y_ple_028
+mh_y_le$ple_foster_care_past_yr_y = mh_y_le$mh_y_ple_028__01
+
 
 #create subset dataframe with only variables used
 mh_y_le = mh_y_le[c("src_subject_id", "eventname", "ple_jail_y", "ple_separ_y", "ple_victim_y", "ple_mh_y", "ple_arrest_y", "ple_law_y", "ple_sud_y", "ple_jail_past_yr_y", "ple_separ_past_yr_y", "ple_victim_past_yr_y", "ple_mh_past_yr_y", "ple_arrest_past_yr_y", "ple_law_past_yr_y", "ple_sud_past_yr_y", "ple_deported_y", "ple_deported_past_yr_y", "ple_foster_care_y", "ple_foster_care_past_yr_y")]
@@ -47,8 +70,14 @@ mh_y_le$ple_arrest_y_bs = ifelse(mh_y_le$ple_arrest_y == 1 & mh_y_le$ple_arrest_
 mh_y_le$ple_law_y_bs = ifelse(mh_y_le$ple_law_y == 1 & mh_y_le$ple_law_past_yr_y == 0, 1, 0)
 mh_y_le$ple_sud_y_bs = ifelse(mh_y_le$ple_sud_y == 1 & mh_y_le$ple_sud_past_yr_y == 0, 1, 0)
 
-#save recoded data to mh_y_le_bs
-mh_y_le_bs = mh_y_le[mh_y_le$eventname == "1_year_follow_up_y_arm_1",]
+
+ #add session ses-00A so future data gets baseline session
+ 
+ #save recoded data to mh_y_le_bs
+#old session label commented out from 5.1 
+#mh_y_le_bs = mh_y_le[mh_y_le$eventname == "1_year_follow_up_y_arm_1",]
+mh_y_le_bs = mh_y_le[mh_y_le$eventname == "ses-01A",]
+
 mh_y_le_bs = mh_y_le_bs[c("src_subject_id", "ple_jail_y_bs", "ple_separ_y_bs", "ple_victim_y_bs", "ple_mh_y_bs", "ple_arrest_y_bs", "ple_law_y_bs", "ple_sud_y_bs")]
 ```
 
@@ -59,10 +88,33 @@ mh_y_le_bs = mh_y_le_bs[c("src_subject_id", "ple_jail_y_bs", "ple_separ_y_bs", "
 #Example item: parent incarceration
 #One of the parents/caregivers went to jail?	1 = Yes; 0 = No
 #Did this happen in the past year?	1 = Yes; 0 = No
-mh_p_le= read.csv("ABCDdatadir/core/mental-health/mh_p_le.csv", header = TRUE, stringsAsFactors = FALSE)
+mh_p_le= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/mh_p_ple.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 mh_p_le[mh_p_le==""] =NA
+
+#recode variable names from 6.0 measures to 5.1 measures
+mh_p_le$src_subject_id = mh_p_le$participant_id
+mh_p_le$eventname = mh_p_le$session_id
+mh_p_le$ple_victim_p = mh_p_le$mh_p_ple_017
+mh_p_le$ple_mh_p = mh_p_le$mh_p_ple_015
+mh_p_le$ple_arrest_p = mh_p_le$mh_p_ple_014
+mh_p_le$ple_law_p = mh_p_le$mh_p_ple_019
+mh_p_le$ple_jail_p = mh_p_le$mh_p_ple_022
+mh_p_le$ple_sud_p = mh_p_le$mh_p_ple_008
+mh_p_le$ple_separ_p = mh_p_le$mh_p_ple_018
+mh_p_le$ple_jail_past_yr_p = mh_p_le$mh_p_ple_022__01
+mh_p_le$ple_separ_past_yr_p = mh_p_le$mh_p_ple_018__01
+mh_p_le$ple_victim_past_yr_p = mh_p_le$mh_p_ple_017__01
+mh_p_le$ple_mh_past_yr_p = mh_p_le$mh_p_ple_015__01
+mh_p_le$ple_arrest_past_yr_p = mh_p_le$mh_p_ple_014__01
+mh_p_le$ple_law_past_yr_p = mh_p_le$mh_p_ple_019__01
+mh_p_le$ple_sud_past_yr_p = mh_p_le$mh_p_ple_008__01
+mh_p_le$ple_deported_p = mh_p_le$mh_p_ple_026
+mh_p_le$ple_deported_past_yr_p = mh_p_le$mh_p_ple_026__01
+mh_p_le$ple_foster_care_p = mh_p_le$mh_p_ple_028
+mh_p_le$ple_foster_care_past_yr_p = mh_p_le$mh_p_ple_028__01
+
 
 #create subset dataframe with only variables used
 mh_p_le = mh_p_le[c("src_subject_id", "eventname", "ple_victim_p", "ple_mh_p", "ple_arrest_p", "ple_law_p", "ple_jail_p", "ple_sud_p", "ple_separ_p", "ple_jail_past_yr_p", "ple_separ_past_yr_p", "ple_victim_past_yr_p", "ple_mh_past_yr_p", "ple_arrest_past_yr_p", "ple_law_past_yr_p", "ple_sud_past_yr_p", "ple_deported_p", "ple_deported_past_yr_p", "ple_foster_care_p", "ple_foster_care_past_yr_p")]
@@ -76,35 +128,51 @@ mh_p_le$ple_law_p_bs = ifelse(mh_p_le$ple_law_p == 1 & mh_p_le$ple_law_past_yr_p
 mh_p_le$ple_sud_p_bs = ifelse(mh_p_le$ple_sud_p == 1 & mh_p_le$ple_sud_past_yr_p == 0, 1, 0)
 
 #save recoded data to mh_p_le_bs
-mh_p_le_bs = mh_p_le[mh_p_le$eventname == "1_year_follow_up_y_arm_1",]
+mh_p_le_bs = mh_p_le[mh_p_le$eventname == "ses-01A",]
 mh_p_le_bs = mh_p_le_bs[c("src_subject_id", "ple_jail_p_bs", "ple_separ_p_bs", "ple_victim_p_bs", "ple_mh_p_bs", "ple_arrest_p_bs", "ple_law_p_bs", "ple_sud_p_bs")]
 
 #merge with youth report and save as csv for future use
 mh_py_le_bs = left_join(mh_y_le_bs, mh_p_le_bs, by=c("src_subject_id")) 
+
 write.csv(mh_py_le_bs, "mh_py_le_bs.csv")
 ```
 
 ```{r step-3-ksads}
 #step 3 - KSADS (parent report)
 
-mh_p_ksads_ptsd= read.csv("ABCDdatadir/core/mental-health/mh_p_ksads_ptsd.csv", header = TRUE, stringsAsFactors = FALSE)
+#KSADS does not include 
+
+mh_p_ksads_ptsd= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/mh_p_ksads_ptsd.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 mh_p_ksads_ptsd[mh_p_ksads_ptsd==""] =NA
 
+mh_p_ksads_ptsd$eventname <-  dplyr::recode(
+  mh_p_ksads_ptsd$eventname,
+  "baseline_year_1_arm_1"= "ses-00A",
+  "1_year_follow_up_y_arm_1" = "ses-01A", 
+  "2_year_follow_up_y_arm_1" = "ses-02A", 
+  "3_year_follow_up_y_arm_1" = "ses-03A"
+)
+
+
 #create subset dataframe with only variables used
 mh_p_ksads_ptsd = mh_p_ksads_ptsd[c("src_subject_id", "eventname", "ksads_ptsd_raw_761_p", "ksads_ptsd_raw_762_p", "ksads_ptsd_raw_763_p", "ksads_ptsd_raw_764_p", "ksads_ptsd_raw_765_p", "ksads_ptsd_raw_767_p", "ksads_ptsd_raw_768_p", "ksads_ptsd_raw_769_p", "ksads_ptsd_raw_766_p", "ksads_ptsd_raw_756_p", "ksads_ptsd_raw_757_p", "ksads_ptsd_raw_758_p", "ksads_ptsd_raw_759_p", "ksads_ptsd_raw_760_p")]
+
 
 ```
 
 ```{r step-4-fes-youth}
 #step 4: Family Environment Scale (youth report)
 #Family members often criticize each other. 
-ce_y_fes= read.csv("ABCDdatadir/core/culture-environment/ce_y_fes.csv", header = TRUE, stringsAsFactors = FALSE)
+ce_y_fes= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/fc_y_fes.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 ce_y_fes[ce_y_fes==""] =NA
 
+ce_y_fes$src_subject_id = ce_y_fes$participant_id
+ce_y_fes$eventname = ce_y_fes$session_id
+ce_y_fes$fes_youth_q5 = ce_y_fes$fc_y_fes__confl_005
 #subset with item needed
 ce_y_fes = ce_y_fes[c("src_subject_id", "eventname", "fes_youth_q5")]
 
@@ -117,10 +185,14 @@ ce_y_fes = ce_y_fes[c("src_subject_id", "eventname", "fes_youth_q5")]
 #recode: <=2 as indicative of emotional neglect
 #ELA+ using decimal with max 1
 
-ce_y_crpbi= read.csv("ABCDdatadir/core/culture-environment/ce_y_crpbi.csv", header = TRUE, stringsAsFactors = FALSE)
+ce_y_crpbi= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/fc_y_crpbi.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 ce_y_crpbi[ce_y_crpbi==""] =NA
+
+ce_y_crpbi$src_subject_id = ce_y_crpbi$participant_id
+ce_y_crpbi$eventname = ce_y_crpbi$session_id
+ce_y_crpbi$crpbi_y_ss_parent = ce_y_crpbi$fc_y_crpbi__cg1_mean
 
 #subset dataframe with only items needed
 ce_y_crpbi = ce_y_crpbi[c("src_subject_id", "eventname", "crpbi_y_ss_parent")]
@@ -141,10 +213,29 @@ ce_y_crpbi$crpbi_y_ss_parent_ace = ifelse(ce_y_crpbi$crpbi_y_ss_parent <2, 1, 0)
 #demo_fam_exp6_v2/demo_fam_exp6_v2_l Needed medical care but couldn't afford it
 #demo_fam_exp7_v2/demo_fam_exp7_v2_l Needed dental care but couldn't afford it
 
-abcd_p_demo= read.csv("ABCDdatadir/core/abcd-general/abcd_p_demo.csv", header = TRUE, stringsAsFactors = FALSE)
+abcd_p_demo= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/ab_p_demo.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 abcd_p_demo[abcd_p_demo==""] =NA
+
+abcd_p_demo$src_subject_id = abcd_p_demo$participant_id
+abcd_p_demo$eventname = abcd_p_demo$session_id
+abcd_p_demo$demo_fam_exp1_v2 = abcd_p_demo$ab_p_demo__exp__fam_001
+abcd_p_demo$demo_fam_exp2_v2 = abcd_p_demo$ab_p_demo__exp__fam_002
+abcd_p_demo$demo_fam_exp3_v2 = abcd_p_demo$ab_p_demo__exp__fam_003
+abcd_p_demo$demo_fam_exp4_v2 = abcd_p_demo$ab_p_demo__exp__fam_004
+abcd_p_demo$demo_fam_exp5_v2 = abcd_p_demo$ab_p_demo__exp__fam_005
+abcd_p_demo$demo_fam_exp6_v2 = abcd_p_demo$ab_p_demo__exp__fam_006
+abcd_p_demo$demo_fam_exp7_v2 = abcd_p_demo$ab_p_demo__exp__fam_007
+abcd_p_demo$demo_fam_exp1_v2_l = abcd_p_demo$ab_p_demo__exp__fam_001
+abcd_p_demo$demo_fam_exp2_v2_l = abcd_p_demo$ab_p_demo__exp__fam_002
+abcd_p_demo$demo_fam_exp3_v2_l = abcd_p_demo$ab_p_demo__exp__fam_003
+abcd_p_demo$demo_fam_exp4_v2_l = abcd_p_demo$ab_p_demo__exp__fam_004
+abcd_p_demo$demo_fam_exp5_v2_l = abcd_p_demo$ab_p_demo__exp__fam_005
+abcd_p_demo$demo_fam_exp6_v2_l = abcd_p_demo$ab_p_demo__exp__fam_006
+abcd_p_demo$demo_fam_exp7_v2_l = abcd_p_demo$ab_p_demo__exp__fam_007
+abcd_p_demo$demo_prnt_marital_v2 = abcd_p_demo$ab_p_demo__marital__slf_001
+abcd_p_demo$demo_prnt_marital_v2_l = abcd_p_demo$ab_p_demo__marital__slf_001
 
 #subset dataframe with only items needed
 abcd_p_demo = abcd_p_demo[c("src_subject_id", "eventname", "demo_fam_exp1_v2", "demo_fam_exp2_v2", "demo_fam_exp3_v2", "demo_fam_exp4_v2", "demo_fam_exp5_v2", "demo_fam_exp6_v2", "demo_fam_exp7_v2", "demo_fam_exp1_v2_l", "demo_fam_exp2_v2_l", "demo_fam_exp3_v2_l", "demo_fam_exp4_v2_l", "demo_fam_exp5_v2_l", "demo_fam_exp6_v2_l", "demo_fam_exp7_v2_l", "demo_prnt_marital_v2", "demo_prnt_marital_v2_l")]
@@ -160,10 +251,17 @@ abcd_p_demo = abcd_p_demo[c("src_subject_id", "eventname", "demo_fam_exp1_v2", "
 #1 = Strongly Disagree /Muy en desacuerdo; 2 = Disagree /En desacuerdo; 3 = Neutral (neither agree nor disagree)/ Neutral (ni de acuerdo ni en desacuerdo); 4 = Agree /De acuerdo; 5 = Strongly Agree/ Muy de acuerdo//
 
 #parent report
-ce_p_nsc= read.csv("ABCDdatadir/core/culture-environment/ce_p_nsc.csv", header = TRUE, stringsAsFactors = FALSE)
+ce_p_nsc= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/fc_p_nsc.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 ce_p_nsc[ce_p_nsc==""] =NA
+
+
+ce_p_nsc$src_subject_id = ce_p_nsc$participant_id
+ce_p_nsc$eventname = ce_p_nsc$session_id
+
+ce_p_nsc$neighborhood2r_p = ce_p_nsc$fc_p_nsc__ns_002
+ce_p_nsc$neighborhood3r_p = ce_p_nsc$fc_p_nsc__ns_003
 
 #subset dataframe with only item needed
 ce_p_nsc = ce_p_nsc[c("src_subject_id", "eventname", "neighborhood2r_p","neighborhood3r_p")]
@@ -174,11 +272,14 @@ ce_p_nsc$neighborhood3r_p_ela = ifelse(ce_p_nsc$neighborhood3r_p >2, 0, 1)
 
 #youth report
 #My neighborhood is safe from crime. (1=Strongly disagree; 5=Strongly agree)
-ce_y_nsc= read.csv("ABCDdatadir/core/culture-environment/ce_y_nsc.csv", header = TRUE, stringsAsFactors = FALSE)
+ce_y_nsc= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/fc_y_nsc.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 ce_y_nsc[ce_y_nsc==""] =NA
 
+ce_y_nsc$src_subject_id = ce_y_nsc$participant_id
+ce_y_nsc$eventname = ce_y_nsc$session_id
+ce_y_nsc$neighborhood_crime_y = ce_y_nsc$fc_y_nsc__ns_003
 #subset dataframe with only item needed
 ce_y_nsc = ce_y_nsc[c("src_subject_id", "eventname", "neighborhood_crime_y")]
 
@@ -192,10 +293,16 @@ ce_y_nsc$nbh_crime_y_ela = ifelse(ce_y_nsc$neighborhood_crime_y >2, 0, 1)
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7441087/ score of >= 64 clinically elevated
 #mh_p_asr	asr_scr_totprob_t	Total Problems ASR Syndrome Scale (t-score)	T-scores in relation to norms for each gender at ages 18-35 and 36-59, based on national probability samples.
 
-mh_p_asr= read.csv("ABCDdatadir/core/mental-health/mh_p_asr.csv", header = TRUE, stringsAsFactors = FALSE)
+#substituting for sum in new dataset! mh_p_asr_sum
+
+mh_p_asr= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/mh_p_asr.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 mh_p_asr[mh_p_asr==""] =NA
+mh_p_asr$src_subject_id = mh_p_asr$participant_id
+mh_p_asr$eventname = mh_p_asr$session_id
+mh_p_asr$asr_scr_totprob_t = mh_p_asr$mh_p_asr_sum
+mh_p_asr$asr_q06_p = mh_p_asr$mh_p_asr__rule_001
 
 #subset dataframe with only items needed
 mh_p_asr = mh_p_asr[c("src_subject_id", "eventname", "asr_scr_totprob_t", "asr_q06_p")]
@@ -214,6 +321,10 @@ mh_p_asr$asr_scr_totprob_t_ace = ifelse(mh_p_asr$asr_scr_totprob_t <64, 0, 1)
 ```{r step-9-fam-hx}
 #step 9 - family history (parent report)
 
+#IMPORTANT! 
+
+#changing this to parents or siblings: 
+#old questions
 #famhx_ss_momdad_ma_p	Either parent with mania problem
 #famhx_ss_momdad_alc_p	Either parent with alcohol problem
 #famhx_ss_momdad_dg_p	Either parent with drug use problem
@@ -222,10 +333,20 @@ mh_p_asr$asr_scr_totprob_t_ace = ifelse(mh_p_asr$asr_scr_totprob_t <64, 0, 1)
 #famhx_ss_momdad_scd_p	Either parent attempted or committed suicide
 #famhx_ss_momdad_vs_p	Either parent with visions of others spying/plotting problem
 
-mh_p_fhx= read.csv("ABCDdatadir/core/mental-health/mh_p_fhx.csv", header = TRUE, stringsAsFactors = FALSE)
+mh_p_fhx= read.csv("/Users/bianca/Mirror/Yassa_Lab/Projects/ABCD/CC_ELA_PVT/data/ABCD_ELA/mental-health/mh_p_famhx.csv", header = TRUE, stringsAsFactors = FALSE)
 
 #recode empty as NA
 mh_p_fhx[mh_p_fhx==""] =NA
+
+mh_p_fhx$src_subject_id = mh_p_fhx$participant_id
+mh_p_fhx$eventname = mh_p_fhx$session_id
+mh_p_fhx$famhx_ss_momdad_ma_p = mh_p_fhx$mh_p_famhx__mania_001__v01
+mh_p_fhx$famhx_ss_momdad_alc_p = mh_p_fhx$mh_p_famhx__alc_001__v01
+mh_p_fhx$famhx_ss_momdad_dg_p = mh_p_fhx$mh_p_famhx__drg_001__v01
+mh_p_fhx$famhx_ss_momdad_dprs_p = mh_p_fhx$mh_p_famhx__dep_001__v01
+mh_p_fhx$famhx_ss_momdad_hspd_p = mh_p_fhx$mh_p_famhx__hosp_001__v01
+mh_p_fhx$famhx_ss_momdad_scd_p = mh_p_fhx$mh_p_famhx__suic_001__v01
+mh_p_fhx$famhx_ss_momdad_vs_p = mh_p_fhx$mh_p_famhx__halluc_001__v01
  
 #subset data with only items needed
 mh_p_fhx = mh_p_fhx[c("src_subject_id", "eventname", "famhx_ss_momdad_ma_p", "famhx_ss_momdad_alc_p", "famhx_ss_momdad_dg_p", "famhx_ss_momdad_dprs_p", "famhx_ss_momdad_hspd_p", "famhx_ss_momdad_scd_p", "famhx_ss_momdad_vs_p")]
@@ -233,15 +354,28 @@ mh_p_fhx = mh_p_fhx[c("src_subject_id", "eventname", "famhx_ss_momdad_ma_p", "fa
 
 ```{r putting-it-all-together}
 #putting together all dataframes created previously into one
-step1 = left_join(mh_y_le, mh_p_le, by=c("src_subject_id", "eventname")) 
-step2 = left_join(step1, mh_p_ksads_ptsd, by=c("src_subject_id", "eventname")) 
-step3 = left_join(step2,ce_y_fes, by=c("src_subject_id", "eventname")) 
-step4 = left_join(step3,ce_y_crpbi, by=c("src_subject_id", "eventname")) 
-step5 = left_join(step4,abcd_p_demo, by=c("src_subject_id", "eventname")) 
-step6 = left_join(step5,ce_p_nsc, by=c("src_subject_id", "eventname"))
-step7 = left_join(step6,ce_y_nsc, by=c("src_subject_id", "eventname"))
-step8 = left_join(step7,mh_p_asr, by=c("src_subject_id", "eventname")) 
-ela_in_abcd = left_join(step8,mh_p_fhx, by=c("src_subject_id", "eventname")) 
+# Fix the ID format mismatch
+mh_p_ksads_ptsd_fixed <- mh_p_ksads_ptsd %>%
+  mutate(src_subject_id = str_replace(src_subject_id, "NDAR_INV", "sub-"))
+
+# Create complete session framework
+all_sessions <- expand_grid(
+  src_subject_id = unique(c(mh_y_le$src_subject_id, mh_p_ksads_ptsd$src_subject_id)),
+  eventname = c("ses-00A", "ses-01A", 
+                "ses-02A", "ses-03A",
+                "ses-04A", "ses-05A",
+                "ses-06A")  # adjust these to your actual eventnames
+)
+step1 = left_join(all_sessions, mh_y_le, by=c("src_subject_id", "eventname"))
+step2 = left_join(step1, mh_p_le, by=c("src_subject_id", "eventname"))
+step3 = left_join(step2, mh_p_ksads_ptsd_fixed, by=c("src_subject_id", "eventname"))
+step4 = left_join(step3, ce_y_fes, by=c("src_subject_id", "eventname"))
+step5 = left_join(step4, ce_y_crpbi, by=c("src_subject_id", "eventname"))
+step6 = left_join(step5, abcd_p_demo, by=c("src_subject_id", "eventname"))
+step7 = left_join(step6, ce_p_nsc, by=c("src_subject_id", "eventname"))
+step8 = left_join(step7, ce_y_nsc, by=c("src_subject_id", "eventname"))
+step9 = left_join(step8, mh_p_asr, by=c("src_subject_id", "eventname"))
+ela_in_abcd = left_join(step9, mh_p_fhx, by=c("src_subject_id", "eventname"))
 
 ela_in_abcd <- ela_in_abcd %>% mutate_at(c("ple_jail_y","ple_separ_y","ple_victim_y","ple_mh_y","ple_arrest_y","ple_law_y","ple_sud_y","ple_foster_care_y","ple_victim_p","ple_mh_p","ple_arrest_p","ple_law_p","ple_jail_p","ple_sud_p","ple_separ_p","ple_foster_care_p","ple_jail_y_bs","ple_separ_y_bs","ple_victim_y_bs","ple_mh_y_bs","ple_arrest_y_bs","ple_law_y_bs","ple_sud_y_bs","ple_victim_p_bs","ple_mh_p_bs","ple_arrest_p_bs","ple_law_p_bs","ple_jail_p_bs","ple_sud_p_bs","ple_separ_p_bs","ksads_ptsd_raw_761_p","ksads_ptsd_raw_762_p","ksads_ptsd_raw_763_p","ksads_ptsd_raw_764_p","ksads_ptsd_raw_765_p","ksads_ptsd_raw_767_p","ksads_ptsd_raw_768_p","ksads_ptsd_raw_769_p","ksads_ptsd_raw_766_p","ksads_ptsd_raw_756_p","ksads_ptsd_raw_757_p","ksads_ptsd_raw_758_p","ksads_ptsd_raw_759_p","ksads_ptsd_raw_760_p","fes_youth_q5","crpbi_y_ss_parent_ace","demo_fam_exp1_v2","demo_fam_exp2_v2","demo_fam_exp3_v2","demo_fam_exp4_v2","demo_fam_exp5_v2","demo_fam_exp6_v2","demo_fam_exp7_v2","demo_fam_exp1_v2_l","demo_fam_exp2_v2_l","demo_fam_exp3_v2_l","demo_fam_exp4_v2_l","demo_fam_exp5_v2_l","demo_fam_exp6_v2_l","demo_fam_exp7_v2_l","neighborhood2r_p","neighborhood2r_p_ela","neighborhood3r_p","neighborhood3r_p_ela","neighborhood_crime_y","nbh_crime_y_ela","asr_scr_totprob_t","asr_q06_p_ace","asr_scr_totprob_t_ace","famhx_ss_momdad_ma_p","famhx_ss_momdad_alc_p","famhx_ss_momdad_dg_p","famhx_ss_momdad_dprs_p","famhx_ss_momdad_hspd_p","famhx_ss_momdad_scd_p","famhx_ss_momdad_vs_p"), as.numeric)
 
@@ -253,4 +387,13 @@ ela_in_abcd = replace_with_na_all(ela_in_abcd, condition = ~.x == 777)
 ela_in_abcd[ela_in_abcd==""] =NA
 
 saveRDS(ela_in_abcd, file = "ela_in_abcd.rds")
+
+test = step3%>%
+  filter(eventname == "ses-00A")
+test = step4%>%
+  filter(eventname == "ses-00A")
+
+test = ela_in_abcd%>%
+  filter(eventname == "ses-00A")
+
 ```
