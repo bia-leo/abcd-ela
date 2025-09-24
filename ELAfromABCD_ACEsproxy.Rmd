@@ -596,8 +596,8 @@ ela_in_abcd_yr4$neglect_phy_yr4 = ifelse(ela_in_abcd_yr4$neglect_phy_sum == 0, 0
 
 #neglect_emo
 #CRPBI parent *CRPBI Mean Parent (primary caregiver)Y crpbi_y_ss_parent_ace
-#only ~5000 with scores, so without further information, omitting for Year 2
-#domain score will stay same as Year 1
+
+ela_in_abcd_yr4$neglect_emo_yr4 = ela_in_abcd_yr4$crpbi_y_ss_parent_ace
 
 
 #divorce
@@ -617,7 +617,8 @@ ela_in_abcd_yr4$divorce_yr4 = ifelse(ela_in_abcd_yr4$divorce_sum == 0, 0, 1)
 #KSADS Witness the grownups in the home push, shove or hit one anotherP 	ksads_ptsd_raw_766_p
 
 #no recode necessary (binary yes/no variable)
-ela_in_abcd_yr4$violence_yr4 = ela_in_abcd_yr4$ksads_ptsd_raw_766_p
+#reuse from year 2 KSADS
+ela_in_abcd_yr4$violence_yr4 = ela_in_abcd_yr2$ksads_ptsd_raw_766_p
 
 
 #mental illness (mi)
@@ -828,9 +829,8 @@ ela_in_abcd_yr6$neglect_phy_yr6 = ifelse(ela_in_abcd_yr6$neglect_phy_sum == 0, 0
 
 #neglect_emo
 #CRPBI parent *CRPBI Mean Parent (primary caregiver)Y crpbi_y_ss_parent_ace
-#only ~5000 with scores, so without further information, omitting for Year 2
-#domain score will stay same as Year 1
 
+ela_in_abcd_yr6$neglect_emo_yr6 = ela_in_abcd_yr6$crpbi_y_ss_parent_ace
 
 #divorce
 #Life Events Parents separated or divorced?Y,P ple_separ_p/ple_separ_y (ple_separ_p_yr2/ple_separ_y_yr2)
@@ -849,7 +849,7 @@ ela_in_abcd_yr6$divorce_yr6 = ifelse(ela_in_abcd_yr6$divorce_sum == 0, 0, 1)
 #KSADS Witness the grownups in the home push, shove or hit one anotherP 	ksads_ptsd_raw_766_p
 
 #no recode necessary (binary yes/no variable)
-ela_in_abcd_yr6$violence_yr6 = ela_in_abcd_yr6$ksads_ptsd_raw_766_p
+ela_in_abcd_yr6$violence_yr6 = ela_in_abcd_yr2$ksads_ptsd_raw_766_p
 
 
 #mental illness (mi)
@@ -908,9 +908,9 @@ bs_scores = ela_in_abcd_bs[c("src_subject_id", "aces_bs", "abuse_phy_bs", "abuse
 yr1_scores_tmp = ela_in_abcd_yr1[c("src_subject_id", "abuse_emo_yr1", "neglect_phy_yr1", "neglect_emo_yr1", "divorce_yr1", "mi_yr1", "incar_yr1", "su_yr1")]
 yr2_scores_tmp = ela_in_abcd_yr2[c("src_subject_id", "abuse_phy_yr2", "abuse_sex_yr2", "abuse_emo_yr2", "neglect_phy_yr2", "divorce_yr2", "violence_yr2", "mi_yr2", "incar_yr2", "su_yr2")]     
 yr3_scores_tmp = ela_in_abcd_yr3[c("src_subject_id", "abuse_emo_yr3", "neglect_phy_yr3", "neglect_emo_yr3", "divorce_yr3", "mi_yr3", "incar_yr3", "su_yr3")]
-yr4_scores_tmp = ela_in_abcd_yr4[c("src_subject_id", "abuse_phy_yr4", "abuse_sex_yr4", "abuse_emo_yr4", "neglect_phy_yr4", "divorce_yr4", "violence_yr4", "mi_yr4", "incar_yr4", "su_yr4")]    
+yr4_scores_tmp = ela_in_abcd_yr4[c("src_subject_id", "abuse_phy_yr4", "abuse_sex_yr4", "abuse_emo_yr4", "neglect_phy_yr4", "neglect_emo_yr4", "divorce_yr4", "violence_yr4", "mi_yr4", "incar_yr4", "su_yr4")]    
 yr5_scores_tmp = ela_in_abcd_yr5[c("src_subject_id", "abuse_emo_yr5", "neglect_phy_yr5", "neglect_emo_yr5", "divorce_yr5", "mi_yr5", "incar_yr5", "su_yr5")]
-yr6_scores_tmp = ela_in_abcd_yr6[c("src_subject_id", "abuse_phy_yr6", "abuse_sex_yr6", "abuse_emo_yr6", "neglect_phy_yr6", "divorce_yr6", "violence_yr6", "mi_yr6", "incar_yr6", "su_yr6")]     
+yr6_scores_tmp = ela_in_abcd_yr6[c("src_subject_id", "abuse_phy_yr6", "abuse_sex_yr6", "abuse_emo_yr6", "neglect_phy_yr6", "neglect_emo_yr6",  "divorce_yr6", "violence_yr6", "mi_yr6", "incar_yr6", "su_yr6")]     
 
 yr1 = left_join(bs_scores,yr1_scores_tmp, by=c("src_subject_id")) 
 yr2 = left_join(yr1, yr2_scores_tmp, by=c("src_subject_id")) 
@@ -1002,7 +1002,7 @@ ela_final$abuse_phy_yr4_build = ifelse(ela_final$abuse_phy_bs == 0 & ela_final$a
 ela_final$abuse_sex_yr4_build = ifelse(ela_final$abuse_sex_bs == 0 & ela_final$abuse_sex_yr4 == 0, 0, 1)
 ela_final$abuse_emo_yr4_build = ifelse(ela_final$abuse_emo_bs == 0 & ela_final$abuse_emo_yr3 == 0 & ela_final$abuse_emo_yr4 == 0, 0, 1)
 ela_final$neglect_phy_yr4_build = ifelse(ela_final$neglect_phy_bs == 0 & ela_final$neglect_phy_yr3 == 0 & ela_final$neglect_phy_yr4 == 0, 0, 1)
-ela_final$neglect_emo_yr4_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr3 == 0, 0, 1)
+ela_final$neglect_emo_yr4_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr3 == 0 & ela_final$neglect_emo_yr4 == 0, 0, 1)
 ela_final$divorce_yr4_build = ifelse(ela_final$divorce_bs == 0 & ela_final$divorce_yr3 == 0 & ela_final$divorce_yr4 == 0, 0, 1)
 ela_final$violence_yr4_build = ifelse(ela_final$violence_bs == 0 & ela_final$violence_yr4 == 0, 0, 1)
 ela_final$mi_yr4_build = ifelse(ela_final$mi_bs == 0 & ela_final$mi_yr3 == 0 & ela_final$mi_yr4 == 0, 0, 1)
@@ -1048,7 +1048,7 @@ ela_final$abuse_phy_yr6_build = ifelse(ela_final$abuse_phy_bs == 0 & ela_final$a
 ela_final$abuse_sex_yr6_build = ifelse(ela_final$abuse_sex_bs == 0 & ela_final$abuse_sex_yr6 == 0, 0, 1)
 ela_final$abuse_emo_yr6_build = ifelse(ela_final$abuse_emo_bs == 0 & ela_final$abuse_emo_yr5 == 0 & ela_final$abuse_emo_yr6 == 0, 0, 1)
 ela_final$neglect_phy_yr6_build = ifelse(ela_final$neglect_phy_bs == 0 & ela_final$neglect_phy_yr5 == 0 & ela_final$neglect_phy_yr6 == 0, 0, 1)
-ela_final$neglect_emo_yr6_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr5 == 0, 0, 1)
+ela_final$neglect_emo_yr6_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr5 == 0 & ela_final$neglect_emo_yr6 == 0, 0, 1)
 ela_final$divorce_yr6_build = ifelse(ela_final$divorce_bs == 0 & ela_final$divorce_yr5 == 0 & ela_final$divorce_yr6 == 0, 0, 1)
 ela_final$violence_yr6_build = ifelse(ela_final$violence_bs == 0 & ela_final$violence_yr6 == 0, 0, 1)
 ela_final$mi_yr6_build = ifelse(ela_final$mi_bs == 0 & ela_final$mi_yr5 == 0 & ela_final$mi_yr6 == 0, 0, 1)
