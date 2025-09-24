@@ -25,8 +25,14 @@ library(tidyr)
 ```{r load-data}
 
 #read RDS file and CSV file for life events
-ela_in_abcd=readRDS("ela_in_abcd.rds")
+ela_in_abcd_data=readRDS("ela_in_abcd.rds")
 mh_py_le_bs=read.csv("mh_py_le_bs.csv")
+
+#filter rows with NDAR- instead of sub- prefixes, these are duplicates from the setup code 
+#and due to differences in the 5.1 and 6.0 subject ID naming conventions 
+
+ela_in_abcd <- ela_in_abcd_data %>%
+  filter(!grepl("^NDAR_", src_subject_id))
 
 #create baseline dataset
 ela_in_abcd_bs = ela_in_abcd[ela_in_abcd$eventname == "ses-00A", ]
@@ -40,6 +46,9 @@ ela_in_abcd_bs = left_join(ela_in_abcd_bs, mh_py_le_bs, by=c("src_subject_id"))
 ela_in_abcd_yr1 = ela_in_abcd[ela_in_abcd$eventname == "ses-01A", ]
 ela_in_abcd_yr2 = ela_in_abcd[ela_in_abcd$eventname == "ses-02A", ]
 ela_in_abcd_yr3 = ela_in_abcd[ela_in_abcd$eventname == "ses-03A", ]
+ela_in_abcd_yr4 = ela_in_abcd[ela_in_abcd$eventname == "ses-04A", ]
+ela_in_abcd_yr5 = ela_in_abcd[ela_in_abcd$eventname == "ses-05A", ]
+ela_in_abcd_yr6 = ela_in_abcd[ela_in_abcd$eventname == "ses-06A", ]
 
 #creating function to sum items in each domain where it will sum across the row as long as at least one variable is not NA
 sum_score <- function(x){
@@ -525,6 +534,370 @@ ela_in_abcd_yr3$su_yr3 = ifelse(ela_in_abcd_yr3$su_sum == 0, 0, 1)
 
 ```
 
+```{r yr4}
+#yr 4 
+
+#abuse_phy
+#KSADS	Shot, stabbed, or beaten brutally by a non-family member	ksads_ptsd_raw_761_p
+#KSADS	Shot, stabbed, or beaten brutally by a grown up in the home	ksads_ptsd_raw_762_p
+#KSADS	Beaten to the point of having bruises by a grown up in the home	ksads_ptsd_raw_763_p
+#KSADS	A non-family member threatened to kill your child	ksads_ptsd_raw_764_p
+#KSADS	A family member threatened to kill your child	ksads_ptsd_raw_765_p
+
+#create dataframe with physical abuse items
+#KSADS data is cut off at year 2
+abuse_phy_yr4_data = c("ksads_ptsd_raw_761_p"  , "ksads_ptsd_raw_762_p", "ksads_ptsd_raw_763_p", "ksads_ptsd_raw_764_p", "ksads_ptsd_raw_765_p")
+
+#sum the items as long as they're not all NA
+#pulling year 2 data to sub in for year 4 
+ela_in_abcd_yr4$abuse_phy_sum = apply(ela_in_abcd_yr2[abuse_phy_yr2_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$abuse_phy_yr4 = ifelse(ela_in_abcd_yr4$abuse_phy_sum == 0, 0, 1)
+
+
+#abuse_sex
+#KSADS A grown up in the home touched your child in their privates, had your child touch their privates, or did other sexual things to your childP ksads_ptsd_raw_767_p
+#KSADS An adult outside your family touched your child in their privates, had your child touch their privates or did other sexual things to your childP ksads_ptsd_raw_768_p
+#KSADS A peer forced your child to do something sexuallyP ksads_ptsd_raw_769_p
+
+#create dataframe with sexual abuse items
+abuse_sex_yr4_data = c("ksads_ptsd_raw_767_p"  , "ksads_ptsd_raw_768_p", "ksads_ptsd_raw_769_p")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$abuse_sex_sum = apply(ela_in_abcd_yr2[abuse_sex_yr2_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$abuse_sex_yr4 = ifelse(ela_in_abcd_yr4$abuse_sex_sum == 0, 0, 1)
+
+
+#abuse_emo
+#Family Environment Family members often criticize each other. fes_youth_q5
+#utilizing youth only to ensure youth exposure
+
+#no recode necessary (binary yes/no variable)
+ela_in_abcd_yr4$abuse_emo_yr4 = ela_in_abcd_yr4$fes_youth_q5 
+
+
+#neglect_phy
+#Demographics Needed food but couldn't afford to buy it or couldn't afford to go out to get it?P demo_fam_exp1_v2_l/demo_fam_exp1_v2
+#Demographics Had someone who needed to see a doctor or go to the hospital but didn't go because you could not afford it?P demo_fam_exp6_v2/demo_fam_exp6_v2_l
+#Demographics Had someone who needed a dentist but couldn't go because you could not afford it?P demo_fam_exp7_v2/demo_fam_exp7_v2_l
+
+#create dataframe with physical neglect items
+neglect_phy_yr4_data = c("demo_fam_exp1_v2_l"  , "demo_fam_exp6_v2_l", "demo_fam_exp7_v2_l")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$neglect_phy_sum = apply(ela_in_abcd_yr4[neglect_phy_yr4_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$neglect_phy_yr4 = ifelse(ela_in_abcd_yr4$neglect_phy_sum == 0, 0, 1)
+
+
+#neglect_emo
+#CRPBI parent *CRPBI Mean Parent (primary caregiver)Y crpbi_y_ss_parent_ace
+#only ~5000 with scores, so without further information, omitting for Year 2
+#domain score will stay same as Year 1
+
+
+#divorce
+#Life Events Parents separated or divorced?Y,P ple_separ_p/ple_separ_y (ple_separ_p_yr2/ple_separ_y_yr2)
+
+#create dataframe with divorce items
+divorce_yr4_data = c("ple_separ_p"  , "ple_separ_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$divorce_sum = apply(ela_in_abcd_yr4[divorce_yr4_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$divorce_yr4 = ifelse(ela_in_abcd_yr4$divorce_sum == 0, 0, 1)
+
+
+#violence in home (violence)
+#KSADS Witness the grownups in the home push, shove or hit one anotherP 	ksads_ptsd_raw_766_p
+
+#no recode necessary (binary yes/no variable)
+ela_in_abcd_yr4$violence_yr4 = ela_in_abcd_yr4$ksads_ptsd_raw_766_p
+
+
+#mental illness (mi)
+#Life Events Family member had mental/emotional problem?Y,P ple_mh_p/ple_mh_y (ple_mh_p_yr2/ple_mh_y_yr2)
+#Adult Self-Report Total Problems ASR Syndrome Scale (t-score)P asr_scr_totprob_t_ace (1=greater than t-score>=64)
+#No Fam Hx at Y2
+
+#create dataframe with mental illness items
+mi_yr4_data = c("ple_mh_p", "ple_mh_y", "asr_scr_totprob_t_ace")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$mi_sum = apply(ela_in_abcd_yr4[mi_yr4_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$mi_yr4 = ifelse(ela_in_abcd_yr4$mi_sum == 0, 0, 1)
+
+
+#Incarcerated Relative
+#Life Events Someone in the family was arrested?Y,P ple_arrest_p/ple_arrest_y (ple_arrest_p_yr2/ple_arrest_y_yr2)
+#Life Events Parents/caregiver got into trouble with the law?Y,P ple_law_p/ple_law_y (ple_law_p_yr2/ple_law_y_yr2)
+#Life Events One of the parents/caregivers went to jail?Y,P ple_jail_p/ple_jail_y (ple_jail_p_yr2/ple_jail_y_yr2)
+
+#create dataframe with incarceration items
+incar_yr4_data = c("ple_arrest_p"  , "ple_arrest_y" , "ple_law_p", "ple_law_y", "ple_jail_p", "ple_jail_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$incar_sum = apply(ela_in_abcd_yr4[incar_yr4_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$incar_yr4 = ifelse(ela_in_abcd_yr4$incar_sum == 0, 0, 1)
+
+
+#Substance Use
+#Life Events Family member had drug and/or alcohol problem?Y,P ple_sud_p/ple_sud_y (ple_sud_p_yr2/ple_sud_y_yr2)
+#Adult Self-Report I use drugs (other than alcohol, nicotine) for nonmedical purposesP asr_q06_p_ace
+#No Fam Hx update at Y2
+
+#create dataframe with substance use items
+su_yr4_data = c("ple_sud_p","ple_sud_y","asr_q06_p_ace")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr4$su_sum = apply(ela_in_abcd_yr4[su_yr4_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr4$su_yr4 = ifelse(ela_in_abcd_yr4$su_sum == 0, 0, 1)
+
+```
+
+
+```{r yr5}
+#yr 5 
+
+#abuse_phy
+#cannot be calculated at Year 3 due to lack of KSADS data
+#domain score will be equal to that at Year 2
+
+#abuse_sex
+#cannot be calculated at Year 3 due to lack of KSADS data
+#domain score will be equal to that at Year 2
+
+#abuse_emo
+#Family Environment Family members often criticize each other. fes_youth_q5
+#utilizing youth only to ensure youth exposure
+
+ela_in_abcd_yr5$abuse_emo_yr5 = ela_in_abcd_yr5$fes_youth_q5 
+
+#neglect_phy
+#Demographics Needed food but couldn't afford to buy it or couldn't afford to go out to get it?P demo_fam_exp1_v2_l/demo_fam_exp1_v2
+#Demographics Had someone who needed to see a doctor or go to the hospital but didn't go because you could not afford it?P demo_fam_exp6_v2/demo_fam_exp6_v2_l
+#Demographics Had someone who needed a dentist but couldn't go because you could not afford it?P demo_fam_exp7_v2/demo_fam_exp7_v2_l
+
+#create dataframe with phys neglect items
+neglect_phy_yr5_data = c("demo_fam_exp1_v2_l" , "demo_fam_exp6_v2_l", "demo_fam_exp7_v2_l")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr5$neglect_phy_sum = apply(ela_in_abcd_yr5[neglect_phy_yr5_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr5$neglect_phy_yr5 = ifelse(ela_in_abcd_yr5$neglect_phy_sum == 0, 0, 1)
+
+
+#neglect_emo
+#CRPBI parent *CRPBI Mean Parent (primary caregiver)Y crpbi_y_ss_parent_ace
+
+ela_in_abcd_yr5$neglect_emo_yr5 = ela_in_abcd_yr5$crpbi_y_ss_parent_ace
+
+
+#divorce
+#Life Events Parents separated or divorced?Y,P ple_separ_p/ple_separ_y (ple_separ_p_yr3/ple_separ_y_yr3)
+
+#create dataframe with divorce items
+divorce_yr5_data = c("ple_separ_p" , "ple_separ_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr5$divorce_sum = apply(ela_in_abcd_yr5[divorce_yr5_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr5$divorce_yr5 = ifelse(ela_in_abcd_yr5$divorce_sum == 0, 0, 1)
+
+
+#violence in home (violence)
+#cannot be calculated at Year 3 due to lack of KSADS data
+#domain score will be equal to that at Year 2
+
+#mental illness (mi)
+#Life Events Family member had mental/emotional problem?Y,P ple_mh_p/ple_mh_y (ple_mh_p_yr3/ple_mh_y_yr3)
+#No ASR or Fam Hx at Y3
+
+#create dataframe with mental illness items
+mi_yr5_data = c("ple_mh_p" , "ple_mh_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr5$mi_sum = apply(ela_in_abcd_yr5[mi_yr5_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr5$mi_yr5 = ifelse(ela_in_abcd_yr5$mi_sum == 0, 0, 1)
+
+
+#Incarcerated Relative
+#Life Events Someone in the family was arrested?Y,P ple_arrest_p/ple_arrest_y (ple_arrest_p_yr3/ple_arrest_y_yr3)
+#Life Events Parents/caregiver got into trouble with the law?Y,P ple_law_p/ple_law_y (ple_law_p_yr3/ple_law_y_yr3)
+#Life Events One of the parents/caregivers went to jail?Y,P ple_jail_p/ple_jail_y (ple_jail_p_yr3/ple_jail_y_yr3)
+
+#create dataframe with incarceration items
+incar_yr5_data = c("ple_arrest_p" , "ple_arrest_y", "ple_law_p", "ple_law_y", "ple_jail_p", "ple_jail_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr5$incar_sum = apply(ela_in_abcd_yr5[incar_yr5_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr5$incar_yr5 = ifelse(ela_in_abcd_yr5$incar_sum == 0, 0, 1)
+
+
+#Substance Use
+#Life Events Family member had drug and/or alcohol problem?Y,P ple_sud_p/ple_sud_y (ple_sud_p_yr5/ple_sud_y_yr5)
+#No ASR or Fam Hx at Y5
+
+#create dataframe with substance abuse items
+su_yr5_data = c("ple_sud_p" , "ple_sud_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr5$su_sum = apply(ela_in_abcd_yr5[su_yr5_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr5$su_yr5 = ifelse(ela_in_abcd_yr5$su_sum == 0, 0, 1)
+
+```
+
+```{r yr6}
+#yr 6 
+
+#abuse_phy
+#KSADS	Shot, stabbed, or beaten brutally by a non-family member	ksads_ptsd_raw_761_p
+#KSADS	Shot, stabbed, or beaten brutally by a grown up in the home	ksads_ptsd_raw_762_p
+#KSADS	Beaten to the point of having bruises by a grown up in the home	ksads_ptsd_raw_763_p
+#KSADS	A non-family member threatened to kill your child	ksads_ptsd_raw_764_p
+#KSADS	A family member threatened to kill your child	ksads_ptsd_raw_765_p
+
+#create dataframe with physical abuse items
+#KSADS data is cut off at year 2 
+abuse_phy_yr6_data = c("ksads_ptsd_raw_761_p"  , "ksads_ptsd_raw_762_p", "ksads_ptsd_raw_763_p", "ksads_ptsd_raw_764_p", "ksads_ptsd_raw_765_p")
+
+#sum the items as long as they're not all NA
+#filling in with year 2 (ses-02A) from 5.1 
+ela_in_abcd_yr6$abuse_phy_sum = apply(ela_in_abcd_yr2[abuse_phy_yr2_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$abuse_phy_yr6 = ifelse(ela_in_abcd_yr6$abuse_phy_sum == 0, 0, 1)
+
+
+#abuse_sex
+#KSADS A grown up in the home touched your child in their privates, had your child touch their privates, or did other sexual things to your childP ksads_ptsd_raw_767_p
+#KSADS An adult outside your family touched your child in their privates, had your child touch their privates or did other sexual things to your childP ksads_ptsd_raw_768_p
+#KSADS A peer forced your child to do something sexuallyP ksads_ptsd_raw_769_p
+
+#create dataframe with sexual abuse items
+abuse_sex_yr6_data = c("ksads_ptsd_raw_767_p"  , "ksads_ptsd_raw_768_p", "ksads_ptsd_raw_769_p")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$abuse_sex_sum = apply(ela_in_abcd_yr2[abuse_sex_yr2_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$abuse_sex_yr6 = ifelse(ela_in_abcd_yr6$abuse_sex_sum == 0, 0, 1)
+
+
+#abuse_emo
+#Family Environment Family members often criticize each other. fes_youth_q5
+#utilizing youth only to ensure youth exposure
+
+#no recode necessary (binary yes/no variable)
+ela_in_abcd_yr6$abuse_emo_yr6 = ela_in_abcd_yr6$fes_youth_q5 
+
+
+#neglect_phy
+#Demographics Needed food but couldn't afford to buy it or couldn't afford to go out to get it?P demo_fam_exp1_v2_l/demo_fam_exp1_v2
+#Demographics Had someone who needed to see a doctor or go to the hospital but didn't go because you could not afford it?P demo_fam_exp6_v2/demo_fam_exp6_v2_l
+#Demographics Had someone who needed a dentist but couldn't go because you could not afford it?P demo_fam_exp7_v2/demo_fam_exp7_v2_l
+
+#create dataframe with physical neglect items
+neglect_phy_yr6_data = c("demo_fam_exp1_v2_l"  , "demo_fam_exp6_v2_l", "demo_fam_exp7_v2_l")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$neglect_phy_sum = apply(ela_in_abcd_yr6[neglect_phy_yr6_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$neglect_phy_yr6 = ifelse(ela_in_abcd_yr6$neglect_phy_sum == 0, 0, 1)
+
+
+#neglect_emo
+#CRPBI parent *CRPBI Mean Parent (primary caregiver)Y crpbi_y_ss_parent_ace
+#only ~5000 with scores, so without further information, omitting for Year 2
+#domain score will stay same as Year 1
+
+
+#divorce
+#Life Events Parents separated or divorced?Y,P ple_separ_p/ple_separ_y (ple_separ_p_yr2/ple_separ_y_yr2)
+
+#create dataframe with divorce items
+divorce_yr6_data = c("ple_separ_p"  , "ple_separ_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$divorce_sum = apply(ela_in_abcd_yr6[divorce_yr6_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$divorce_yr6 = ifelse(ela_in_abcd_yr6$divorce_sum == 0, 0, 1)
+
+
+#violence in home (violence)
+#KSADS Witness the grownups in the home push, shove or hit one anotherP 	ksads_ptsd_raw_766_p
+
+#no recode necessary (binary yes/no variable)
+ela_in_abcd_yr6$violence_yr6 = ela_in_abcd_yr6$ksads_ptsd_raw_766_p
+
+
+#mental illness (mi)
+#Life Events Family member had mental/emotional problem?Y,P ple_mh_p/ple_mh_y (ple_mh_p_yr2/ple_mh_y_yr2)
+#Adult Self-Report Total Problems ASR Syndrome Scale (t-score)P asr_scr_totprob_t_ace (1=greater than t-score>=64)
+#No Fam Hx at Y2
+
+#create dataframe with mental illness items
+mi_yr6_data = c("ple_mh_p", "ple_mh_y", "asr_scr_totprob_t_ace")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$mi_sum = apply(ela_in_abcd_yr6[mi_yr6_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$mi_yr6 = ifelse(ela_in_abcd_yr6$mi_sum == 0, 0, 1)
+
+
+#Incarcerated Relative
+#Life Events Someone in the family was arrested?Y,P ple_arrest_p/ple_arrest_y (ple_arrest_p_yr2/ple_arrest_y_yr2)
+#Life Events Parents/caregiver got into trouble with the law?Y,P ple_law_p/ple_law_y (ple_law_p_yr2/ple_law_y_yr2)
+#Life Events One of the parents/caregivers went to jail?Y,P ple_jail_p/ple_jail_y (ple_jail_p_yr2/ple_jail_y_yr2)
+
+#create dataframe with incarceration items
+incar_yr6_data = c("ple_arrest_p"  , "ple_arrest_y" , "ple_law_p", "ple_law_y", "ple_jail_p", "ple_jail_y")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$incar_sum = apply(ela_in_abcd_yr6[incar_yr6_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$incar_yr6 = ifelse(ela_in_abcd_yr6$incar_sum == 0, 0, 1)
+
+
+#Substance Use
+#Life Events Family member had drug and/or alcohol problem?Y,P ple_sud_p/ple_sud_y (ple_sud_p_yr6/ple_sud_y_yr6)
+#Adult Self-Report I use drugs (other than alcohol, nicotine) for nonmedical purposesP asr_q06_p_ace
+#No Fam Hx update at Y2
+
+#create dataframe with substance use items
+su_yr6_data = c("ple_sud_p","ple_sud_y","asr_q06_p_ace")
+
+#sum the items as long as they're not all NA
+ela_in_abcd_yr6$su_sum = apply(ela_in_abcd_yr6[su_yr6_data],1, sum_score)
+
+#binary recode as anything > 0 is 1
+ela_in_abcd_yr6$su_yr6 = ifelse(ela_in_abcd_yr6$su_sum == 0, 0, 1)
+
+```
+
 ```{r score-creation}
 ##LONGITUDINAL SCORE CREATION
 
@@ -535,14 +908,20 @@ bs_scores = ela_in_abcd_bs[c("src_subject_id", "aces_bs", "abuse_phy_bs", "abuse
 yr1_scores_tmp = ela_in_abcd_yr1[c("src_subject_id", "abuse_emo_yr1", "neglect_phy_yr1", "neglect_emo_yr1", "divorce_yr1", "mi_yr1", "incar_yr1", "su_yr1")]
 yr2_scores_tmp = ela_in_abcd_yr2[c("src_subject_id", "abuse_phy_yr2", "abuse_sex_yr2", "abuse_emo_yr2", "neglect_phy_yr2", "divorce_yr2", "violence_yr2", "mi_yr2", "incar_yr2", "su_yr2")]     
 yr3_scores_tmp = ela_in_abcd_yr3[c("src_subject_id", "abuse_emo_yr3", "neglect_phy_yr3", "neglect_emo_yr3", "divorce_yr3", "mi_yr3", "incar_yr3", "su_yr3")]
+yr4_scores_tmp = ela_in_abcd_yr4[c("src_subject_id", "abuse_phy_yr4", "abuse_sex_yr4", "abuse_emo_yr4", "neglect_phy_yr4", "divorce_yr4", "violence_yr4", "mi_yr4", "incar_yr4", "su_yr4")]    
+yr5_scores_tmp = ela_in_abcd_yr5[c("src_subject_id", "abuse_emo_yr5", "neglect_phy_yr5", "neglect_emo_yr5", "divorce_yr5", "mi_yr5", "incar_yr5", "su_yr5")]
+yr6_scores_tmp = ela_in_abcd_yr6[c("src_subject_id", "abuse_phy_yr6", "abuse_sex_yr6", "abuse_emo_yr6", "neglect_phy_yr6", "divorce_yr6", "violence_yr6", "mi_yr6", "incar_yr6", "su_yr6")]     
 
 yr1 = left_join(bs_scores,yr1_scores_tmp, by=c("src_subject_id")) 
 yr2 = left_join(yr1, yr2_scores_tmp, by=c("src_subject_id")) 
-ela_final = left_join(yr2, yr3_scores_tmp, by=c("src_subject_id"))
+yr3 = left_join(yr2, yr3_scores_tmp, by=c("src_subject_id")) 
+yr4 = left_join(yr3, yr4_scores_tmp, by=c("src_subject_id")) 
+yr5 = left_join(yr4, yr5_scores_tmp, by=c("src_subject_id")) 
+ela_final = left_join(yr5, yr6_scores_tmp, by=c("src_subject_id"))
 
 #save bs data
 #prep for return to long format
-bs_scores$eventname="baseline_year_1_arm_1"
+bs_scores$eventname="ses-00A"
 lookup = c(aces_proxy="aces_bs", abuse_phy = "abuse_phy_bs", abuse_sex = "abuse_sex_bs", abuse_emo = "abuse_emo_bs", neglect_phy = "neglect_phy_bs", neglect_emo = "neglect_emo_bs", divorce = "divorce_bs", violence = "violence_bs", mental = "mi_bs", incar = "incar_bs", sud = "su_bs")
 bs_scores=rename(bs_scores, all_of(lookup))
 
@@ -568,7 +947,7 @@ ela_final$aces_yr1_build = ela_final$abuse_phy_yr1_build + ela_final$abuse_sex_y
 yr1_scores_final = ela_final[c("src_subject_id", "aces_yr1_build", "abuse_phy_yr1_build", "abuse_sex_yr1_build", "abuse_emo_yr1_build", "neglect_phy_yr1_build", "neglect_emo_yr1_build", "divorce_yr1_build", "violence_yr1_build", "mi_yr1_build", "incar_yr1_build", "su_yr1_build")]
 
 #prep for return to long format
-yr1_scores_final$eventname="1_year_follow_up_y_arm_1"
+yr1_scores_final$eventname="ses-01A"
 lookup = c(aces_proxy = "aces_yr1_build", abuse_phy = "abuse_phy_yr1_build", abuse_sex = "abuse_sex_yr1_build", abuse_emo = "abuse_emo_yr1_build", neglect_phy = "neglect_phy_yr1_build", neglect_emo = "neglect_emo_yr1_build", divorce = "divorce_yr1_build", violence = "violence_yr1_build", mental = "mi_yr1_build", incar = "incar_yr1_build", sud = "su_yr1_build")
 yr1_scores_final=rename(yr1_scores_final, all_of(lookup))
 
@@ -591,7 +970,7 @@ ela_final$aces_yr2_build = ela_final$abuse_phy_yr2_build + ela_final$abuse_sex_y
 yr2_scores_final = ela_final[c("src_subject_id", "aces_yr2_build", "abuse_phy_yr2_build", "abuse_sex_yr2_build", "abuse_emo_yr2_build", "neglect_phy_yr2_build", "neglect_emo_yr2_build", "divorce_yr2_build", "violence_yr2_build", "mi_yr2_build", "incar_yr2_build", "su_yr2_build")]
 
 #prep for return to long format
-yr2_scores_final$eventname="2_year_follow_up_y_arm_1"
+yr2_scores_final$eventname="ses-02A"
 lookup = c(aces_proxy = "aces_yr2_build", abuse_phy = "abuse_phy_yr2_build", abuse_sex = "abuse_sex_yr2_build", abuse_emo = "abuse_emo_yr2_build", neglect_phy = "neglect_phy_yr2_build", neglect_emo = "neglect_emo_yr2_build", divorce = "divorce_yr2_build", violence = "violence_yr2_build", mental = "mi_yr2_build", incar = "incar_yr2_build", sud = "su_yr2_build")
 yr2_scores_final=rename(yr2_scores_final, all_of(lookup))
 
@@ -614,14 +993,88 @@ ela_final$aces_yr3_build = ela_final$abuse_phy_yr3_build + ela_final$abuse_sex_y
 yr3_scores_final = ela_final[c("src_subject_id", "aces_yr3_build", "abuse_phy_yr3_build", "abuse_sex_yr3_build", "abuse_emo_yr3_build", "neglect_phy_yr3_build", "neglect_emo_yr3_build", "divorce_yr3_build", "violence_yr3_build", "mi_yr3_build", "incar_yr3_build", "su_yr3_build")]
 
 #prep for return to long format
-yr3_scores_final$eventname="3_year_follow_up_y_arm_1"
+yr3_scores_final$eventname="ses-03A"
 lookup = c(aces_proxy = "aces_yr3_build", abuse_phy = "abuse_phy_yr3_build", abuse_sex = "abuse_sex_yr3_build", abuse_emo = "abuse_emo_yr3_build", neglect_phy = "neglect_phy_yr3_build", neglect_emo = "neglect_emo_yr3_build", divorce = "divorce_yr3_build", violence = "violence_yr3_build", mental = "mi_yr3_build", incar = "incar_yr3_build", sud = "su_yr3_build")
 yr3_scores_final=rename(yr3_scores_final, all_of(lookup))
+
+#yr4 by domain
+ela_final$abuse_phy_yr4_build = ifelse(ela_final$abuse_phy_bs == 0 & ela_final$abuse_phy_yr4 == 0, 0, 1)
+ela_final$abuse_sex_yr4_build = ifelse(ela_final$abuse_sex_bs == 0 & ela_final$abuse_sex_yr4 == 0, 0, 1)
+ela_final$abuse_emo_yr4_build = ifelse(ela_final$abuse_emo_bs == 0 & ela_final$abuse_emo_yr3 == 0 & ela_final$abuse_emo_yr4 == 0, 0, 1)
+ela_final$neglect_phy_yr4_build = ifelse(ela_final$neglect_phy_bs == 0 & ela_final$neglect_phy_yr3 == 0 & ela_final$neglect_phy_yr4 == 0, 0, 1)
+ela_final$neglect_emo_yr4_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr3 == 0, 0, 1)
+ela_final$divorce_yr4_build = ifelse(ela_final$divorce_bs == 0 & ela_final$divorce_yr3 == 0 & ela_final$divorce_yr4 == 0, 0, 1)
+ela_final$violence_yr4_build = ifelse(ela_final$violence_bs == 0 & ela_final$violence_yr4 == 0, 0, 1)
+ela_final$mi_yr4_build = ifelse(ela_final$mi_bs == 0 & ela_final$mi_yr3 == 0 & ela_final$mi_yr4 == 0, 0, 1)
+ela_final$incar_yr4_build = ifelse(ela_final$incar_bs == 0 & ela_final$incar_yr3 == 0 & ela_final$incar_yr4 == 0, 0, 1)
+ela_final$su_yr4_build = ifelse(ela_final$su_bs == 0 & ela_final$su_yr3 == 0 & ela_final$su_yr4 == 0, 0, 1)
+
+#yr4 sum score
+ela_final$aces_yr4_build = ela_final$abuse_phy_yr4_build + ela_final$abuse_sex_yr4_build + ela_final$abuse_emo_yr4_build + ela_final$neglect_phy_yr4_build + ela_final$neglect_emo_yr4_build + ela_final$divorce_yr4_build + ela_final$violence_yr4_build + ela_final$mi_yr4_build + ela_final$incar_yr4_build + ela_final$su_yr4_build
+
+#save yr4 data
+yr4_scores_final = ela_final[c("src_subject_id", "aces_yr4_build", "abuse_phy_yr4_build", "abuse_sex_yr4_build", "abuse_emo_yr4_build", "neglect_phy_yr4_build", "neglect_emo_yr4_build", "divorce_yr4_build", "violence_yr4_build", "mi_yr4_build", "incar_yr4_build", "su_yr4_build")]
+
+#prep for return to long format
+yr4_scores_final$eventname="ses-04A"
+lookup = c(aces_proxy = "aces_yr4_build", abuse_phy = "abuse_phy_yr4_build", abuse_sex = "abuse_sex_yr4_build", abuse_emo = "abuse_emo_yr4_build", neglect_phy = "neglect_phy_yr4_build", neglect_emo = "neglect_emo_yr4_build", divorce = "divorce_yr4_build", violence = "violence_yr4_build", mental = "mi_yr4_build", incar = "incar_yr4_build", sud = "su_yr4_build")
+yr4_scores_final=rename(yr4_scores_final, all_of(lookup))
+
+#yr5 by domain
+ela_final$abuse_phy_yr5_build = ifelse(ela_final$abuse_phy_bs == 0 & ela_final$abuse_phy_yr4 == 0, 0, 1)
+ela_final$abuse_sex_yr5_build = ifelse(ela_final$abuse_sex_bs == 0 & ela_final$abuse_sex_yr4 == 0, 0, 1)
+ela_final$abuse_emo_yr5_build = ifelse(ela_final$abuse_emo_bs == 0 & ela_final$abuse_emo_yr3 == 0 & ela_final$abuse_emo_yr4 == 0 & ela_final$abuse_emo_yr5 == 0, 0, 1)
+ela_final$neglect_phy_yr5_build = ifelse(ela_final$neglect_phy_bs == 0 & ela_final$neglect_phy_yr3 == 0 & ela_final$neglect_phy_yr4 == 0 & ela_final$neglect_phy_yr5 == 0, 0, 1)
+ela_final$neglect_emo_yr5_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr3 == 0 & ela_final$neglect_emo_yr5 == 0, 0, 1)
+ela_final$divorce_yr5_build = ifelse(ela_final$divorce_bs == 0 & ela_final$divorce_yr3 == 0 & ela_final$divorce_yr4 == 0 & ela_final$divorce_yr5 == 0, 0, 1)
+ela_final$mi_yr5_build = ifelse(ela_final$mi_bs == 0 & ela_final$mi_yr3 == 0 & ela_final$mi_yr4 == 0 & ela_final$mi_yr5 == 0, 0, 1)
+ela_final$incar_yr5_build = ifelse(ela_final$incar_bs == 0 & ela_final$incar_yr3 == 0 & ela_final$incar_yr4 == 0 & ela_final$incar_yr5 == 0, 0, 1)
+ela_final$su_yr5_build = ifelse(ela_final$su_bs == 0 & ela_final$su_yr3 == 0 & ela_final$su_yr4 == 0 & ela_final$su_yr5 == 0, 0, 1)
+ela_final$violence_yr5_build = ifelse(ela_final$violence_bs == 0 & ela_final$violence_yr4 == 0, 0, 1)
+
+#yr5 sum score
+ela_final$aces_yr5_build = ela_final$abuse_phy_yr5_build + ela_final$abuse_sex_yr5_build + ela_final$abuse_emo_yr5_build + ela_final$neglect_phy_yr5_build + ela_final$neglect_emo_yr5_build + ela_final$divorce_yr5_build + ela_final$violence_yr5_build + ela_final$mi_yr5_build + ela_final$incar_yr5_build + ela_final$su_yr5_build
+
+#save yr5 data
+yr5_scores_final = ela_final[c("src_subject_id", "aces_yr5_build", "abuse_phy_yr5_build", "abuse_sex_yr5_build", "abuse_emo_yr5_build", "neglect_phy_yr5_build", "neglect_emo_yr5_build", "divorce_yr5_build", "violence_yr5_build", "mi_yr5_build", "incar_yr5_build", "su_yr5_build")]
+
+#prep for return to long format
+yr5_scores_final$eventname="ses-05A"
+lookup = c(aces_proxy = "aces_yr5_build", abuse_phy = "abuse_phy_yr5_build", abuse_sex = "abuse_sex_yr5_build", abuse_emo = "abuse_emo_yr5_build", neglect_phy = "neglect_phy_yr5_build", neglect_emo = "neglect_emo_yr5_build", divorce = "divorce_yr5_build", violence = "violence_yr5_build", mental = "mi_yr5_build", incar = "incar_yr5_build", sud = "su_yr5_build")
+yr5_scores_final=rename(yr5_scores_final, all_of(lookup))
+
+#yr6 by domain
+ela_final$abuse_phy_yr6_build = ifelse(ela_final$abuse_phy_bs == 0 & ela_final$abuse_phy_yr6 == 0, 0, 1)
+ela_final$abuse_sex_yr6_build = ifelse(ela_final$abuse_sex_bs == 0 & ela_final$abuse_sex_yr6 == 0, 0, 1)
+ela_final$abuse_emo_yr6_build = ifelse(ela_final$abuse_emo_bs == 0 & ela_final$abuse_emo_yr5 == 0 & ela_final$abuse_emo_yr6 == 0, 0, 1)
+ela_final$neglect_phy_yr6_build = ifelse(ela_final$neglect_phy_bs == 0 & ela_final$neglect_phy_yr5 == 0 & ela_final$neglect_phy_yr6 == 0, 0, 1)
+ela_final$neglect_emo_yr6_build = ifelse(ela_final$neglect_emo_bs == 0 & ela_final$neglect_emo_yr5 == 0, 0, 1)
+ela_final$divorce_yr6_build = ifelse(ela_final$divorce_bs == 0 & ela_final$divorce_yr5 == 0 & ela_final$divorce_yr6 == 0, 0, 1)
+ela_final$violence_yr6_build = ifelse(ela_final$violence_bs == 0 & ela_final$violence_yr6 == 0, 0, 1)
+ela_final$mi_yr6_build = ifelse(ela_final$mi_bs == 0 & ela_final$mi_yr5 == 0 & ela_final$mi_yr6 == 0, 0, 1)
+ela_final$incar_yr6_build = ifelse(ela_final$incar_bs == 0 & ela_final$incar_yr5 == 0 & ela_final$incar_yr6 == 0, 0, 1)
+ela_final$su_yr6_build = ifelse(ela_final$su_bs == 0 & ela_final$su_yr5 == 0 & ela_final$su_yr6 == 0, 0, 1)
+
+#yr6 sum score
+ela_final$aces_yr6_build = ela_final$abuse_phy_yr6_build + ela_final$abuse_sex_yr6_build + ela_final$abuse_emo_yr6_build + ela_final$neglect_phy_yr6_build + ela_final$neglect_emo_yr6_build + ela_final$divorce_yr6_build + ela_final$violence_yr6_build + ela_final$mi_yr6_build + ela_final$incar_yr6_build + ela_final$su_yr6_build
+
+#save yr6 data
+yr6_scores_final = ela_final[c("src_subject_id", "aces_yr6_build", "abuse_phy_yr6_build", "abuse_sex_yr6_build", "abuse_emo_yr6_build", "neglect_phy_yr6_build", "neglect_emo_yr6_build", "divorce_yr6_build", "violence_yr6_build", "mi_yr6_build", "incar_yr6_build", "su_yr6_build")]
+
+#prep for return to long format
+yr6_scores_final$eventname="ses-06A"
+lookup = c(aces_proxy = "aces_yr6_build", abuse_phy = "abuse_phy_yr6_build", abuse_sex = "abuse_sex_yr6_build", abuse_emo = "abuse_emo_yr6_build", neglect_phy = "neglect_phy_yr6_build", neglect_emo = "neglect_emo_yr6_build", divorce = "divorce_yr6_build", violence = "violence_yr6_build", mental = "mi_yr6_build", incar = "incar_yr6_build", sud = "su_yr6_build")
+yr6_scores_final=rename(yr6_scores_final, all_of(lookup))
+
 
 #combine datasets
 step1=rbind(bs_scores,yr1_scores_final)
 step2=rbind(step1,yr2_scores_final)
-ela_in_abcd_scores=rbind(step2,yr3_scores_final)
+step3=rbind(step2,yr3_scores_final)
+step4=rbind(step3,yr4_scores_final)
+step5=rbind(step4,yr5_scores_final)
+
+ela_in_abcd_scores=rbind(step5,yr6_scores_final)
 
 #save data
 write.csv(ela_in_abcd_scores, "aces_proxy_abcd.csv")
