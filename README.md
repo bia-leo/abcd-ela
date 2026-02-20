@@ -1,5 +1,7 @@
 # abcd-ela
 
+ADAPTED FOR ABCD 6.0 FROM THE AUTHORS BELOW
+
 R Markdown files for creating measures of early life adversity in ABCD Data Release 5.1.
 
 You will need to run ELAfromABCD_setup.Rmd prior to running any of the code to create scores. The setup code will create csv and rds files needed for the score calculations.
